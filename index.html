@@ -149,7 +149,7 @@
 
         .control-panel { grid-area: control; }
         .scoreboard { grid-area: scoreboard; }
-        .teams-grid { grid-area: teams; }
+        .lineup-section { grid-area: teams; }
 
         @media (min-width: 768px) {
             .main-grid {
@@ -552,6 +552,68 @@
         .score-input:focus {
             outline: 1px solid #555;
             background: #333;
+        }
+
+        .roster-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .roster-toolbar-head {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .roster-toolbar-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #3730a3;
+        }
+
+        .roster-toolbar-desc {
+            font-size: 0.75rem;
+            color: #6366f1;
+        }
+
+        .roster-toolbar-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .roster-btn {
+            padding: 0.45rem 0.9rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .roster-btn.template {
+            background: #4f46e5;
+        }
+
+        .roster-btn.template:hover {
+            background: #4338ca;
+        }
+
+        .roster-btn.upload {
+            background: #0d9488;
+        }
+
+        .roster-btn.upload:hover {
+            background: #0f766e;
         }
 
         .teams-grid {
@@ -991,6 +1053,19 @@
                 margin-top: 1rem;
             }
 
+            .roster-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .roster-toolbar-buttons {
+                width: 100%;
+            }
+
+            .roster-btn {
+                flex: 1;
+            }
+
             .modal-buttons {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -1007,18 +1082,18 @@
         <h2 class="font-korean-light">Playball Now</h2>
         
         <div class="backup-buttons">
-            <button class="backup-btn font-korean" onclick="downloadBackup()" title="게임 데이터 백업 다운로드">
+            <button class="backup-btn font-korean" onclick="downloadBackup()" title="게임 전체 백업 저장 (JSON: 점수·카운트·기록 포함)">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <span class="text">다운로드</span>
+                <span class="text">백업</span>
             </button>
-            
-            <button class="backup-btn font-korean" onclick="uploadBackup()" title="백업 파일에서 게임 데이터 복원">
+
+            <button class="backup-btn font-korean" onclick="uploadBackup()" title="게임 전체 백업 불러오기 (JSON)">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
-                <span class="text">업로드</span>
+                <span class="text">복원</span>
             </button>
         </div>
     </header>
@@ -1180,7 +1255,19 @@
                     </div>
                 </div>
 
-                <div class="teams-grid">
+                <div class="lineup-section">
+                    <div class="roster-toolbar">
+                        <div class="roster-toolbar-head">
+                            <span class="roster-toolbar-title font-korean">📋 선수 명단 (엑셀)</span>
+                            <span class="roster-toolbar-desc font-korean">선수 이름만 일괄 등록 · 점수/기록과 무관</span>
+                        </div>
+                        <div class="roster-toolbar-buttons">
+                            <button type="button" class="roster-btn template font-korean" onclick="downloadRosterTemplate()">양식 다운로드</button>
+                            <button type="button" class="roster-btn upload font-korean" onclick="uploadRoster()">명단 업로드</button>
+                        </div>
+                    </div>
+
+                    <div class="teams-grid">
                     <div class="team-section" id="home-team-section">
                         <div class="team-header">
                             <h3 class="team-title font-korean">HOME</h3>
@@ -1199,6 +1286,7 @@
                             </div>
                         </div>
                         <ul class="player-list" id="away-players"></ul>
+                    </div>
                     </div>
                 </div>
         </div>
@@ -1269,6 +1357,7 @@
     </div>
 
     <input type="file" id="backup-file-input" accept=".json" style="display: none;" onchange="handleBackupFile(event)">
+    <input type="file" id="roster-file-input" accept=".xlsx,.xls" style="display: none;" onchange="handleRosterFile(event)">
 
     <!-- Audio elements for sound effects (embedded as base64) -->
     <audio id="audio-1" preload="auto">
@@ -1283,6 +1372,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script>
         let gameState = {
@@ -2077,6 +2167,105 @@
             reader.readAsText(file);
 
             event.target.value = '';
+        }
+
+        // ===== 엑셀 선수 명단 (이름만 일괄 등록, 게임 기록과 무관) =====
+
+        // HOME/AWAY 두 시트에 [타순, 선수명] 양식을 만들어 내려준다.
+        function downloadRosterTemplate() {
+            if (typeof XLSX === 'undefined') {
+                alert('엑셀 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            ['HOME', 'AWAY'].forEach(label => {
+                const aoa = [['타순', '선수명']];
+                for (let i = 1; i <= 9; i++) aoa.push([i, '']);
+                const ws = XLSX.utils.aoa_to_sheet(aoa);
+                ws['!cols'] = [{ wch: 8 }, { wch: 22 }];
+                XLSX.utils.book_append_sheet(wb, ws, label);
+            });
+            XLSX.writeFile(wb, `playball_roster_template_${getFormattedDate()}.xlsx`);
+        }
+
+        function uploadRoster() {
+            if (typeof XLSX === 'undefined') {
+                alert('엑셀 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            document.getElementById('roster-file-input').click();
+        }
+
+        function handleRosterFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const roster = {};
+                    ['home', 'away'].forEach((team, idx) => {
+                        // 시트명이 HOME/AWAY면 그것을, 없으면 순서대로 첫/둘째 시트 사용
+                        const sheetName =
+                            wb.SheetNames.find(n => n.trim().toUpperCase() === team.toUpperCase()) ||
+                            wb.SheetNames[idx];
+                        if (!sheetName) return;
+                        const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, blankrows: false });
+                        const names = [];
+                        for (let i = 1; i < rows.length; i++) { // 0행은 헤더
+                            const row = rows[i] || [];
+                            // [타순, 선수명] 기준. 선수명이 없고 한 칸짜리면 그 값을 이름으로 간주(헤더 오인 방지 위해 1열 우선)
+                            let name = row[1];
+                            if (name === undefined && row.length === 1) name = row[0];
+                            names.push(name === undefined || name === null ? '' : String(name).trim());
+                        }
+                        // 뒤쪽 빈칸 제거
+                        while (names.length && !names[names.length - 1]) names.pop();
+                        roster[team] = names;
+                    });
+                    applyRoster(roster);
+                } catch (error) {
+                    alert('엑셀 파일을 읽는 중 오류가 발생했습니다. 양식 파일인지 확인해주세요.');
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        function applyRoster(roster) {
+            const targets = ['home', 'away'].filter(t => roster[t] && roster[t].some(n => n));
+            if (targets.length === 0) {
+                alert('엑셀에서 선수명을 찾지 못했습니다.\n양식의 "선수명" 칸에 이름을 입력했는지 확인해주세요.');
+                return;
+            }
+
+            const teamLabels = targets.map(t => (t === 'home' ? 'HOME' : 'AWAY')).join(', ');
+            if (!confirm(`엑셀 명단으로 ${teamLabels} 라인업을 교체합니다.\n해당 팀의 기존 선수와 타석 기록은 삭제됩니다. 계속할까요?`)) {
+                return;
+            }
+
+            targets.forEach(team => {
+                const teamData = gameState[team + 'Team'];
+                // 기존 선수가 반영해 둔 통계/득점을 되돌린다
+                teamData.players.forEach(p => p.atBats.forEach(ab => {
+                    if (ab.category) updateStatsForAtBat(team, ab.category, -1);
+                    reverseHomerunRun(team, ab);
+                }));
+
+                const names = roster[team];
+                teamData.players = names.map((name, i) => ({
+                    id: i + 1,
+                    name: name,
+                    atBats: [{}, {}, {}]
+                }));
+                gameState.nextPlayerId[team] = names.length + 1;
+            });
+
+            updateTeamSections();
+            updateScoreboard();
+            alert(`엑셀 명단을 성공적으로 불러왔습니다! (${teamLabels})`);
         }
 
         function syncTeamNameInputs() {
