@@ -23,17 +23,33 @@
             --neon-orange: hsl(30, 100%, 61.6%);
         }
 
+        html {
+            /* 좁은 화면에서 내부 요소가 뷰포트보다 넓어져도 가로 스크롤·여백이 생기지 않도록 */
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Nanum Gothic', sans-serif;
             background: #f3f4f6;
             color: #1f2937;
             min-height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
         }
 
+        /* 헤더·푸터는 항상 뷰포트 전체 폭을 채운다 */
+        .header,
+        .footer {
+            width: 100%;
+        }
+
         .container {
             flex: 1 0 auto;
+            /* flex 아이템 기본 min-width:auto 때문에 내부 콘텐츠가 뷰포트를 밀어내는 것을 방지 */
+            min-width: 0;
         }
 
         .font-korean {
@@ -145,6 +161,15 @@
                 "teams";
             gap: 1rem;
             margin-bottom: 1rem;
+            /* 그리드 트랙이 콘텐츠 최소폭만큼 늘어나 가로 오버플로를 일으키지 않도록 */
+            min-width: 0;
+        }
+
+        /* 그리드 아이템도 내부 콘텐츠가 넘쳐도 트랙 폭을 넘기지 않도록 축소 허용 */
+        .control-panel,
+        .scoreboard,
+        .teams-grid {
+            min-width: 0;
         }
 
         .control-panel { grid-area: control; }
