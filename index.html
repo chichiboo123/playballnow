@@ -183,9 +183,16 @@
             width: 20px;
             height: 20px;
             background: white;
+            border: none;
+            padding: 0;
             cursor: pointer;
             transition: all 0.3s;
             clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        }
+
+        .base:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
         }
 
         .base.active {
@@ -208,10 +215,12 @@
             left: 0;
         }
         
-        .base.home { 
-            bottom: 0; 
-            right: 0; 
-            background: white;
+        .base.home {
+            bottom: 0;
+            right: 0;
+            background: #facc15;
+            cursor: default;
+            clip-path: polygon(50% 0, 100% 35%, 100% 100%, 0 100%, 0 35%);
         }
 
         .bso-section {
@@ -249,8 +258,15 @@
             height: 1.25rem;
             border-radius: 50%;
             background: #4b5563;
+            border: none;
+            padding: 0;
             cursor: pointer;
             transition: all 0.3s;
+        }
+
+        .indicator:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
         }
 
         .indicator.active.ball { 
@@ -345,9 +361,41 @@
             text-shadow: 0px 0px 3px white;
         }
 
+        .sound-btn-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            flex: 1;
+        }
+
+        .sound-label {
+            color: #d1d5db;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.75rem 0 0.25rem;
+        }
+
+        .volume-row label {
+            color: #d1d5db;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .volume-row input[type="range"] {
+            flex: 1;
+            cursor: pointer;
+        }
+
         .sound-source {
             text-align: center;
-            color: #6b7280;
+            color: #9ca3af;
             font-size: 0.75rem;
             margin-top: 0.5rem;
         }
@@ -408,6 +456,64 @@
 
         .score-table .stat-cell {
             background: #374151;
+        }
+
+        .score-table th.current-inning,
+        .score-table td.current-inning {
+            background: #1d4ed8;
+            box-shadow: inset 0 0 0 2px var(--neon-orange);
+        }
+
+        .score-table td.current-inning .score-input {
+            color: #fff;
+        }
+
+        .score-table th:first-child,
+        .score-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        .score-table th:first-child {
+            background: #2a2a2a;
+        }
+
+        .score-table td:first-child {
+            background: #1a1a1a;
+        }
+
+        .inning-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .inning-badge {
+            background: var(--neon-orange);
+            color: #1f2937;
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .inning-nav-btn {
+            background: #374151;
+            color: #fff;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .inning-nav-btn:hover {
+            background: #4b5563;
         }
 
         .score-input {
@@ -664,7 +770,7 @@
         .footer {
             text-align: center;
             padding: 2rem;
-            color: #6b7280;
+            color: #d1d5db;
             background: #1f2937;
             margin-top: 2rem;
         }
@@ -818,6 +924,14 @@
             .modal-buttons {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .scoreboard-section {
+                order: -1;
+            }
+        }
+
+        .modal-content:focus {
+            outline: none;
         }
     </style>
 </head>
@@ -849,10 +963,10 @@
                 <div class="diamond-container">
                     <h2 class="diamond-title font-korean">주자 표시판</h2>
                     <div class="diamond">
-                        <div class="base first" id="base-first" onclick="toggleBase('first')"></div>
-                        <div class="base second" id="base-second" onclick="toggleBase('second')"></div>
-                        <div class="base third" id="base-third" onclick="toggleBase('third')"></div>
-                        <div class="base home"></div>
+                        <button type="button" class="base first" id="base-first" aria-label="1루 주자" aria-pressed="false" onclick="toggleBase('first')"></button>
+                        <button type="button" class="base second" id="base-second" aria-label="2루 주자" aria-pressed="false" onclick="toggleBase('second')"></button>
+                        <button type="button" class="base third" id="base-third" aria-label="3루 주자" aria-pressed="false" onclick="toggleBase('third')"></button>
+                        <div class="base home" aria-hidden="true"></div>
                     </div>
                 </div>
 
@@ -860,24 +974,24 @@
                     <h2 class="bso-title font-korean">Ball / Strike / Out</h2>
                     <div class="bso-row">
                         <span class="bso-label font-scoreboard">B:</span>
-                        <div class="bso-indicators">
-                            <div class="indicator" id="ball-0" onclick="toggleIndicator('ball', 0)"></div>
-                            <div class="indicator" id="ball-1" onclick="toggleIndicator('ball', 1)"></div>
-                            <div class="indicator" id="ball-2" onclick="toggleIndicator('ball', 2)"></div>
+                        <div class="bso-indicators" role="group" aria-label="볼 카운트">
+                            <button type="button" class="indicator" id="ball-0" aria-label="볼 1" aria-pressed="false" onclick="toggleIndicator('ball', 0)"></button>
+                            <button type="button" class="indicator" id="ball-1" aria-label="볼 2" aria-pressed="false" onclick="toggleIndicator('ball', 1)"></button>
+                            <button type="button" class="indicator" id="ball-2" aria-label="볼 3" aria-pressed="false" onclick="toggleIndicator('ball', 2)"></button>
                         </div>
                     </div>
                     <div class="bso-row">
                         <span class="bso-label font-scoreboard">S:</span>
-                        <div class="bso-indicators">
-                            <div class="indicator" id="strike-0" onclick="toggleIndicator('strike', 0)"></div>
-                            <div class="indicator" id="strike-1" onclick="toggleIndicator('strike', 1)"></div>
+                        <div class="bso-indicators" role="group" aria-label="스트라이크 카운트">
+                            <button type="button" class="indicator" id="strike-0" aria-label="스트라이크 1" aria-pressed="false" onclick="toggleIndicator('strike', 0)"></button>
+                            <button type="button" class="indicator" id="strike-1" aria-label="스트라이크 2" aria-pressed="false" onclick="toggleIndicator('strike', 1)"></button>
                         </div>
                     </div>
                     <div class="bso-row">
                         <span class="bso-label font-scoreboard">O:</span>
-                        <div class="bso-indicators">
-                            <div class="indicator" id="out-0" onclick="toggleIndicator('out', 0)"></div>
-                            <div class="indicator" id="out-1" onclick="toggleIndicator('out', 1)"></div>
+                        <div class="bso-indicators" role="group" aria-label="아웃 카운트">
+                            <button type="button" class="indicator" id="out-0" aria-label="아웃 1" aria-pressed="false" onclick="toggleIndicator('out', 0)"></button>
+                            <button type="button" class="indicator" id="out-1" aria-label="아웃 2" aria-pressed="false" onclick="toggleIndicator('out', 1)"></button>
                         </div>
                     </div>
                     
@@ -890,15 +1004,28 @@
                 <div class="sound-effects">
                     <h3 class="sound-title font-korean">야구장 효과음</h3>
                     <div class="sound-buttons">
-                        <button class="sound-btn" id="sound-1" onclick="toggleSound(1)">
-                            <span>1</span>
-                        </button>
-                        <button class="sound-btn" id="sound-2" onclick="toggleSound(2)">
-                            <span>2</span>
-                        </button>
-                        <button class="sound-btn" id="sound-3" onclick="toggleSound(3)">
-                            <span>3</span>
-                        </button>
+                        <div class="sound-btn-wrap">
+                            <button class="sound-btn" id="sound-1" aria-pressed="false" aria-label="응원가 1 재생" onclick="toggleSound(1)">
+                                <span>1</span>
+                            </button>
+                            <span class="sound-label font-korean">응원가 1</span>
+                        </div>
+                        <div class="sound-btn-wrap">
+                            <button class="sound-btn" id="sound-2" aria-pressed="false" aria-label="응원가 2 재생" onclick="toggleSound(2)">
+                                <span>2</span>
+                            </button>
+                            <span class="sound-label font-korean">응원가 2</span>
+                        </div>
+                        <div class="sound-btn-wrap">
+                            <button class="sound-btn" id="sound-3" aria-pressed="false" aria-label="응원가 3 재생" onclick="toggleSound(3)">
+                                <span>3</span>
+                            </button>
+                            <span class="sound-label font-korean">응원가 3</span>
+                        </div>
+                    </div>
+                    <div class="volume-row">
+                        <label for="volume-slider" class="font-korean">🔊 음량</label>
+                        <input type="range" id="volume-slider" min="0" max="100" value="70" oninput="setVolume(this.value)" aria-label="효과음 음량">
                     </div>
                     <div class="sound-source">
                         음원출처: <a href="https://www.101soundboards.com/" target="_blank" rel="noopener noreferrer">www.101soundboards.com</a>
@@ -909,7 +1036,13 @@
             <div class="scoreboard-section">
                 <div class="scoreboard">
                     <h2 class="scoreboard-title font-korean">전광판</h2>
-                    
+
+                    <div class="inning-status">
+                        <button type="button" class="inning-nav-btn font-korean" onclick="changeInning(-1)" aria-label="이전 이닝">◀</button>
+                        <span class="inning-badge font-korean" id="inning-badge">1회 초</span>
+                        <button type="button" class="inning-nav-btn font-korean" onclick="changeInning(1)" aria-label="다음 이닝">▶</button>
+                    </div>
+
                     <div style="overflow-x: auto;">
                         <table class="score-table font-scoreboard">
                             <thead>
@@ -1021,10 +1154,10 @@
     </footer>
 
     <!-- At-Bat Modal -->
-    <div class="modal" id="atbat-modal">
-        <div class="modal-content">
+    <div class="modal" id="atbat-modal" role="dialog" aria-modal="true" aria-labelledby="atbat-modal-title">
+        <div class="modal-content" tabindex="-1">
             <div class="modal-header">
-                <h3 class="modal-title font-korean">선택하세요</h3>
+                <h3 class="modal-title font-korean" id="atbat-modal-title">선택하세요</h3>
                 <p class="modal-info" id="modal-player-info"></p>
             </div>
             <div class="modal-buttons">
@@ -1048,10 +1181,10 @@
     </div>
 
     <!-- Reset Modal -->
-    <div class="modal" id="reset-modal">
-        <div class="modal-content">
+    <div class="modal" id="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+        <div class="modal-content" tabindex="-1">
             <div class="modal-header">
-                <h3 class="modal-title font-korean">확인</h3>
+                <h3 class="modal-title font-korean" id="reset-modal-title">확인</h3>
                 <p class="modal-info">확인을 누르면 모든 내용이 사라집니다. 초기화하시겠습니까?</p>
             </div>
             <div class="modal-actions">
@@ -1082,13 +1215,13 @@
             homeTeam: {
                 name: "HOME",
                 players: [],
-                inningScores: Array(11).fill(0),
+                inningScores: Array(11).fill(null),
                 stats: { hits: 0, errors: 0, walks: 0 }
             },
             awayTeam: {
                 name: "AWAY", 
                 players: [],
-                inningScores: Array(11).fill(0),
+                inningScores: Array(11).fill(null),
                 stats: { hits: 0, errors: 0, walks: 0 }
             },
             bso: {
@@ -1101,6 +1234,8 @@
                 second: false,
                 third: false
             },
+            currentInning: 0,
+            half: 'top',
             nextPlayerId: { home: 4, away: 4 },
             currentSound: null,
             modalState: {
@@ -1110,6 +1245,64 @@
                 atBatIndex: null
             }
         };
+
+        const STORAGE_KEY = 'playballnow_state';
+        let isRestoring = false;
+        let lastFocusedElement = null;
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function saveState() {
+            if (isRestoring) return;
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+            } catch (e) {
+                // localStorage 사용 불가(시크릿 모드 등) 시 조용히 무시
+            }
+        }
+
+        // 누락된 필드를 기본값으로 채워 이전 버전 백업/저장본과 호환
+        function normalizeState(state) {
+            if (!state || !state.homeTeam || !state.awayTeam) return null;
+            ['homeTeam', 'awayTeam'].forEach(key => {
+                const t = state[key];
+                if (!Array.isArray(t.inningScores)) t.inningScores = Array(11).fill(null);
+                while (t.inningScores.length < 11) t.inningScores.push(null);
+                if (!t.stats) t.stats = { hits: 0, errors: 0, walks: 0 };
+                if (!Array.isArray(t.players)) t.players = [];
+                t.players.forEach(p => {
+                    if (!Array.isArray(p.atBats) || p.atBats.length === 0) p.atBats = [{}, {}, {}];
+                });
+            });
+            if (!state.bso) state.bso = { balls: [false, false, false], strikes: [false, false], outs: [false, false] };
+            if (!state.bases) state.bases = { first: false, second: false, third: false };
+            if (typeof state.currentInning !== 'number') state.currentInning = 0;
+            if (state.half !== 'top' && state.half !== 'bottom') state.half = 'top';
+            if (!state.nextPlayerId) state.nextPlayerId = { home: 4, away: 4 };
+            state.currentSound = null;
+            state.modalState = { isOpen: false, team: null, playerId: null, atBatIndex: null };
+            return state;
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return false;
+                const parsed = normalizeState(JSON.parse(raw));
+                if (!parsed) return false;
+                gameState = parsed;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
 
         function initializePlayers() {
             for (let i = 1; i <= 3; i++) {
@@ -1136,12 +1329,11 @@
         function updateBases() {
             ['first', 'second', 'third'].forEach(base => {
                 const element = document.getElementById(`base-${base}`);
-                if (gameState.bases[base]) {
-                    element.classList.add('active');
-                } else {
-                    element.classList.remove('active');
-                }
+                const on = !!gameState.bases[base];
+                element.classList.toggle('active', on);
+                element.setAttribute('aria-pressed', on);
             });
+            saveState();
         }
 
         function updateBSO() {
@@ -1150,42 +1342,61 @@
                 const count = type === 'ball' ? 3 : 2;
                 for (let i = 0; i < count; i++) {
                     const element = document.getElementById(`${type}-${i}`);
-                    if (gameState.bso[pluralType][i]) {
+                    const on = !!gameState.bso[pluralType][i];
+                    if (on) {
                         element.classList.add('active', type);
                     } else {
                         element.classList.remove('active', type);
                     }
+                    element.setAttribute('aria-pressed', on);
                 }
             });
+            saveState();
         }
 
         function updateScoreboard() {
             ['home', 'away'].forEach(team => {
                 const teamData = gameState[team + 'Team'];
-                
+
                 const nameInput = document.getElementById(`${team}-team-name`);
-                if (nameInput && nameInput.value === '') {
-                    nameInput.value = teamData.name;
+                if (nameInput && document.activeElement !== nameInput) {
+                    nameInput.value = teamData.name === (team === 'home' ? 'HOME' : 'AWAY') ? '' : teamData.name;
                 }
-                
+
                 for (let i = 0; i < 11; i++) {
                     const input = document.getElementById(`${team}-inning-${i}`);
-                    if (input) input.value = teamData.inningScores[i];
+                    if (input && document.activeElement !== input) {
+                        const score = teamData.inningScores[i];
+                        input.value = (score === null || score === undefined) ? '' : score;
+                    }
+                    const cell = input ? input.parentElement : null;
+                    if (cell) cell.classList.toggle('current-inning', i === gameState.currentInning);
                 }
-                
-                const totalRuns = teamData.inningScores.reduce((sum, score) => sum + score, 0);
+
+                const totalRuns = teamData.inningScores.reduce((sum, score) => sum + (score || 0), 0);
                 const runsEl = document.getElementById(`${team}-runs`);
                 if (runsEl) runsEl.textContent = totalRuns;
-                
+
                 const hitsEl = document.getElementById(`${team}-hits`);
                 if (hitsEl) hitsEl.textContent = teamData.stats.hits;
-                
+
                 const errorsEl = document.getElementById(`${team}-errors`);
                 if (errorsEl) errorsEl.textContent = teamData.stats.errors;
-                
+
                 const walksEl = document.getElementById(`${team}-walks`);
                 if (walksEl) walksEl.textContent = teamData.stats.walks;
             });
+
+            updateInningBadge();
+            saveState();
+        }
+
+        function updateInningBadge() {
+            const badge = document.getElementById('inning-badge');
+            if (badge) {
+                const halfLabel = gameState.half === 'top' ? '초' : '말';
+                badge.textContent = `${gameState.currentInning + 1}회 ${halfLabel}`;
+            }
         }
 
         function updateTeamSections() {
@@ -1215,8 +1426,8 @@
                     li.innerHTML = `
                         <div class="player-row">
                             <div class="player-number">${index + 1}</div>
-                            <input type="text" class="player-input font-korean" 
-                                   value="${player.name}" 
+                            <input type="text" class="player-input font-korean"
+                                   value="${escapeHtml(player.name)}"
                                    placeholder="Player Name"
                                    onchange="updatePlayerName('${team}', ${player.id}, this.value)">
                         </div>
@@ -1232,6 +1443,7 @@
                     playerList.appendChild(li);
                 });
             });
+            saveState();
         }
 
         function toggleBase(base) {
@@ -1239,9 +1451,15 @@
             updateBases();
         }
 
+        // 왼쪽부터 누적 점등. 가장 마지막으로 켜진 칸을 다시 누르면 그 칸은 꺼짐.
         function toggleIndicator(type, index) {
             const pluralType = type + 's';
-            gameState.bso[pluralType][index] = !gameState.bso[pluralType][index];
+            const arr = gameState.bso[pluralType];
+            const current = arr.filter(Boolean).length;
+            const newCount = (current === index + 1) ? index : index + 1;
+            for (let i = 0; i < arr.length; i++) {
+                arr[i] = i < newCount;
+            }
             updateBSO();
         }
 
@@ -1262,8 +1480,36 @@
                 second: false,
                 third: false
             };
+            // 공수교대: 초 → 말 → 다음 이닝 초
+            if (gameState.half === 'top') {
+                gameState.half = 'bottom';
+            } else {
+                gameState.half = 'top';
+                if (gameState.currentInning < 10) gameState.currentInning++;
+            }
             updateBases();
             updateBSO();
+            updateScoreboard();
+        }
+
+        // 전광판 화살표로 현재 이닝을 직접 이동(초/말 토글 후 이닝 증감)
+        function changeInning(delta) {
+            if (delta > 0) {
+                if (gameState.half === 'top') {
+                    gameState.half = 'bottom';
+                } else if (gameState.currentInning < 10) {
+                    gameState.half = 'top';
+                    gameState.currentInning++;
+                }
+            } else {
+                if (gameState.half === 'bottom') {
+                    gameState.half = 'top';
+                } else if (gameState.currentInning > 0) {
+                    gameState.half = 'bottom';
+                    gameState.currentInning--;
+                }
+            }
+            updateScoreboard();
         }
 
         function updateTeamName(team, name) {
@@ -1272,7 +1518,8 @@
         }
 
         function updateInningScore(team, inning, value) {
-            const score = Math.max(0, Math.min(99, parseInt(value) || 0));
+            const trimmed = String(value).trim();
+            const score = trimmed === '' ? null : Math.max(0, Math.min(99, parseInt(trimmed) || 0));
             gameState[team + 'Team'].inningScores[inning] = score;
             updateScoreboard();
         }
@@ -1302,6 +1549,7 @@
             const player = teamData.players.find(p => p.id === playerId);
             if (player) {
                 player.name = name;
+                saveState();
             }
         }
 
@@ -1341,9 +1589,9 @@
             const player = teamData.players.find(p => p.id === playerId);
             const playerName = player.name || `선수 ${playerId}`;
             
-            document.getElementById('modal-player-info').textContent = 
+            document.getElementById('modal-player-info').textContent =
                 `${teamData.name} - ${playerName} (${atBatIndex + 1}번째 타석)`;
-            document.getElementById('atbat-modal').classList.add('show');
+            openModal('atbat-modal');
         }
 
         function closeAtBatModal() {
@@ -1353,7 +1601,24 @@
                 playerId: null,
                 atBatIndex: null
             };
-            document.getElementById('atbat-modal').classList.remove('show');
+            closeModal('atbat-modal');
+        }
+
+        // 모달 공통: 포커스 저장/복원 + 첫 포커스 이동
+        function openModal(id) {
+            lastFocusedElement = document.activeElement;
+            const modal = document.getElementById(id);
+            modal.classList.add('show');
+            const content = modal.querySelector('.modal-content');
+            if (content) content.focus();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+            if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                lastFocusedElement.focus();
+                lastFocusedElement = null;
+            }
         }
 
         function selectAtBatResult(result, category) {
@@ -1405,45 +1670,60 @@
             }
         }
 
+        let soundVolume = 0.7;
+
+        function setVolume(value) {
+            soundVolume = Math.max(0, Math.min(1, value / 100));
+            [1, 2, 3].forEach(n => {
+                const a = document.getElementById(`audio-${n}`);
+                if (a) a.volume = soundVolume;
+            });
+        }
+
+        function setSoundButtonState(trackNumber, active) {
+            const button = document.getElementById(`sound-${trackNumber}`);
+            if (!button) return;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active);
+        }
+
         function toggleSound(trackNumber) {
             const audio = document.getElementById(`audio-${trackNumber}`);
             const button = document.getElementById(`sound-${trackNumber}`);
-            
+
             if (gameState.currentSound === trackNumber) {
                 audio.pause();
                 audio.currentTime = 0;
-                button.classList.remove('active');
+                setSoundButtonState(trackNumber, false);
                 gameState.currentSound = null;
             } else {
                 if (gameState.currentSound) {
                     const prevAudio = document.getElementById(`audio-${gameState.currentSound}`);
-                    const prevButton = document.getElementById(`sound-${gameState.currentSound}`);
                     if (prevAudio) {
                         prevAudio.pause();
                         prevAudio.currentTime = 0;
                     }
-                    if (prevButton) {
-                        prevButton.classList.remove('active');
-                    }
+                    setSoundButtonState(gameState.currentSound, false);
                 }
-                
+
+                audio.volume = soundVolume;
                 audio.play().catch(err => console.error("재생 오류:", err));
-                button.classList.add('active');
+                setSoundButtonState(trackNumber, true);
                 gameState.currentSound = trackNumber;
-                
+
                 audio.onended = () => {
-                    button.classList.remove('active');
+                    setSoundButtonState(trackNumber, false);
                     gameState.currentSound = null;
                 };
             }
         }
 
         function showResetModal() {
-            document.getElementById('reset-modal').classList.add('show');
+            openModal('reset-modal');
         }
 
         function closeResetModal() {
-            document.getElementById('reset-modal').classList.remove('show');
+            closeModal('reset-modal');
         }
 
         function confirmReset() {
@@ -1451,13 +1731,13 @@
                 homeTeam: {
                     name: "HOME",
                     players: [],
-                    inningScores: Array(11).fill(0),
+                    inningScores: Array(11).fill(null),
                     stats: { hits: 0, errors: 0, walks: 0 }
                 },
                 awayTeam: {
                     name: "AWAY",
                     players: [],
-                    inningScores: Array(11).fill(0),
+                    inningScores: Array(11).fill(null),
                     stats: { hits: 0, errors: 0, walks: 0 }
                 },
                 bso: {
@@ -1470,6 +1750,8 @@
                     second: false,
                     third: false
                 },
+                currentInning: 0,
+                half: 'top',
                 nextPlayerId: { home: 4, away: 4 },
                 currentSound: null,
                 modalState: {
@@ -1481,10 +1763,10 @@
             };
             
             const homeInput = document.getElementById('home-team-name');
-            if (homeInput) homeInput.value = 'HOME';
+            if (homeInput) homeInput.value = '';
             const awayInput = document.getElementById('away-team-name');
-            if (awayInput) awayInput.value = 'AWAY';
-            
+            if (awayInput) awayInput.value = '';
+
             initializePlayers();
             updateUI();
             closeResetModal();
@@ -1515,17 +1797,17 @@
             }
             content += "R | H | E | B |\n";
             
-            const homeRuns = gameState.homeTeam.inningScores.reduce((sum, score) => sum + score, 0);
+            const homeRuns = gameState.homeTeam.inningScores.reduce((sum, score) => sum + (score || 0), 0);
             content += `${gameState.homeTeam.name.padEnd(8)} | `;
             gameState.homeTeam.inningScores.forEach(score => {
-                content += `${score} | `;
+                content += `${score === null || score === undefined ? '-' : score} | `;
             });
             content += `${homeRuns} | ${gameState.homeTeam.stats.hits} | ${gameState.homeTeam.stats.errors} | ${gameState.homeTeam.stats.walks} |\n`;
             
-            const awayRuns = gameState.awayTeam.inningScores.reduce((sum, score) => sum + score, 0);
+            const awayRuns = gameState.awayTeam.inningScores.reduce((sum, score) => sum + (score || 0), 0);
             content += `${gameState.awayTeam.name.padEnd(8)} | `;
             gameState.awayTeam.inningScores.forEach(score => {
-                content += `${score} | `;
+                content += `${score === null || score === undefined ? '-' : score} | `;
             });
             content += `${awayRuns} | ${gameState.awayTeam.stats.hits} | ${gameState.awayTeam.stats.errors} | ${gameState.awayTeam.stats.walks} |\n\n`;
             
@@ -1559,81 +1841,47 @@
             URL.revokeObjectURL(url);
         }
 
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('portrait', 'mm', 'a4');
-            
-            doc.setFontSize(20);
-            doc.text('어디서나 야구장 (Playball Now)', 105, 20, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.text(`${gameState.homeTeam.name} vs ${gameState.awayTeam.name}`, 105, 30, { align: 'center' });
-            doc.text(`날짜: ${new Date().toLocaleDateString()}`, 105, 38, { align: 'center' });
-            
-            let yPos = 50;
-            doc.setFontSize(14);
-            doc.text('Scoreboard', 20, yPos);
-            
-            yPos += 10;
-            doc.setFontSize(10);
-            
-            const homeRuns = gameState.homeTeam.inningScores.reduce((sum, score) => sum + score, 0);
-            const awayRuns = gameState.awayTeam.inningScores.reduce((sum, score) => sum + score, 0);
-            
-            let scoreText = `${gameState.homeTeam.name}: `;
-            scoreText += gameState.homeTeam.inningScores.join(' | ');
-            scoreText += ` | R:${homeRuns} H:${gameState.homeTeam.stats.hits} E:${gameState.homeTeam.stats.errors} B:${gameState.homeTeam.stats.walks}`;
-            doc.text(scoreText, 20, yPos);
-            
-            yPos += 7;
-            scoreText = `${gameState.awayTeam.name}: `;
-            scoreText += gameState.awayTeam.inningScores.join(' | ');
-            scoreText += ` | R:${awayRuns} H:${gameState.awayTeam.stats.hits} E:${gameState.awayTeam.stats.errors} B:${gameState.awayTeam.stats.walks}`;
-            doc.text(scoreText, 20, yPos);
-            
-            yPos += 15;
-            doc.setFontSize(14);
-            doc.text(`${gameState.homeTeam.name} Lineup`, 20, yPos);
-            yPos += 7;
-            doc.setFontSize(10);
-            
-            gameState.homeTeam.players.forEach((player, index) => {
-                const atBatResults = player.atBats
-                    .filter(atBat => atBat.result)
-                    .map(atBat => atBat.result)
-                    .join(', ');
-                doc.text(`${index + 1}. ${player.name || 'No Name'}: ${atBatResults || 'No Records'}`, 20, yPos);
-                yPos += 6;
-            });
-            
-            yPos += 5;
-            doc.setFontSize(14);
-            doc.text(`${gameState.awayTeam.name} Lineup`, 20, yPos);
-            yPos += 7;
-            doc.setFontSize(10);
-            
-            gameState.awayTeam.players.forEach((player, index) => {
-                const atBatResults = player.atBats
-                    .filter(atBat => atBat.result)
-                    .map(atBat => atBat.result)
-                    .join(', ');
-                doc.text(`${index + 1}. ${player.name || 'No Name'}: ${atBatResults || 'No Records'}`, 20, yPos);
-                yPos += 6;
-            });
-            
-            doc.setFontSize(8);
-            doc.text('Created by. 교육뮤지컬 꿈꾸는 치수쌤', 105, 280, { align: 'center' });
-            
-            doc.save(`baseball_scoreboard_${getFormattedDate()}.pdf`);
-        }
-
-        function downloadJPG() {
-            html2canvas(document.body, {
+        // 내보내기 대상: 전광판 + 라인업 영역(헤더/액션 버튼 제외)
+        function captureBoard() {
+            if (typeof html2canvas === 'undefined') {
+                alert('이미지 변환 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+                return Promise.reject(new Error('html2canvas not loaded'));
+            }
+            return html2canvas(document.querySelector('.main-grid'), {
                 scale: 2,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#f3f4f6'
-            }).then(canvas => {
+            });
+        }
+
+        // jsPDF 기본 폰트는 한글을 지원하지 않으므로, 화면을 이미지로 캡처해 PDF에 삽입한다.
+        function downloadPDF() {
+            if (!window.jspdf) {
+                alert('PDF 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+                return;
+            }
+            captureBoard().then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('portrait', 'mm', 'a4');
+                const pageW = 210, pageH = 297, margin = 10;
+                const maxW = pageW - margin * 2;
+                const maxH = pageH - margin * 2;
+
+                let imgW = maxW;
+                let imgH = canvas.height * imgW / canvas.width;
+                if (imgH > maxH) {
+                    imgH = maxH;
+                    imgW = canvas.width * imgH / canvas.height;
+                }
+                const x = (pageW - imgW) / 2;
+                doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', x, margin, imgW, imgH);
+                doc.save(`baseball_scoreboard_${getFormattedDate()}.pdf`);
+            }).catch(() => {});
+        }
+
+        function downloadJPG() {
+            captureBoard().then(canvas => {
                 canvas.toBlob(blob => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -1644,7 +1892,7 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 'image/jpeg', 0.95);
-            });
+            }).catch(() => {});
         }
 
         function downloadBackup() {
@@ -1677,29 +1925,66 @@
             reader.onload = (e) => {
                 try {
                     const backupData = JSON.parse(e.target.result);
-                    
-                    if (backupData.gameState) {
-                        gameState = backupData.gameState;
-                        
-                        const homeInput = document.getElementById('home-team-name');
-                        if (homeInput) homeInput.value = gameState.homeTeam.name;
-                        const awayInput = document.getElementById('away-team-name');
-                        if (awayInput) awayInput.value = gameState.awayTeam.name;
-                        
-                        updateUI();
-                        alert('백업 데이터를 성공적으로 복원했습니다!');
+                    const restored = normalizeState(backupData && backupData.gameState);
+
+                    if (!restored) {
+                        alert('올바른 백업 파일이 아닙니다.');
+                        return;
                     }
+
+                    if (!confirm('현재 진행 중인 경기 기록이 복원 데이터로 덮어써집니다. 계속하시겠습니까?')) {
+                        return;
+                    }
+
+                    isRestoring = true;
+                    gameState = restored;
+                    isRestoring = false;
+
+                    syncTeamNameInputs();
+                    updateUI();
+                    alert('백업 데이터를 성공적으로 복원했습니다!');
                 } catch (error) {
                     alert('백업 파일을 읽는 중 오류가 발생했습니다.');
                     console.error(error);
                 }
             };
             reader.readAsText(file);
-            
+
             event.target.value = '';
         }
 
-        initializePlayers();
+        function syncTeamNameInputs() {
+            const homeInput = document.getElementById('home-team-name');
+            if (homeInput) homeInput.value = gameState.homeTeam.name === 'HOME' ? '' : gameState.homeTeam.name;
+            const awayInput = document.getElementById('away-team-name');
+            if (awayInput) awayInput.value = gameState.awayTeam.name === 'AWAY' ? '' : gameState.awayTeam.name;
+        }
+
+        // ESC로 닫기 + 배경 클릭으로 닫기
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('atbat-modal').classList.contains('show')) closeAtBatModal();
+                if (document.getElementById('reset-modal').classList.contains('show')) closeResetModal();
+            }
+        });
+
+        ['atbat-modal', 'reset-modal'].forEach(id => {
+            document.getElementById(id).addEventListener('mousedown', (e) => {
+                if (e.target === e.currentTarget) {
+                    id === 'atbat-modal' ? closeAtBatModal() : closeResetModal();
+                }
+            });
+        });
+
+        // 시작: 저장된 기록이 있으면 복원, 없으면 새 경기
+        isRestoring = true;
+        const hadSaved = loadState();
+        if (!hadSaved) {
+            initializePlayers();
+        }
+        isRestoring = false;
+        syncTeamNameInputs();
+        setVolume(70);
         updateUI();
     </script>
 </body>
