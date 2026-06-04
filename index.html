@@ -2179,10 +2179,11 @@
             }
             const wb = XLSX.utils.book_new();
             ['HOME', 'AWAY'].forEach(label => {
-                const aoa = [['타순', '선수명']];
+                // C열 안내문은 파싱에서 무시되므로 자유롭게 적어도 됩니다.
+                const aoa = [['타순', '선수명', '※ 인원 제한 없음 - 9명을 넘으면 아래에 행을 계속 추가하세요']];
                 for (let i = 1; i <= 9; i++) aoa.push([i, '']);
                 const ws = XLSX.utils.aoa_to_sheet(aoa);
-                ws['!cols'] = [{ wch: 8 }, { wch: 22 }];
+                ws['!cols'] = [{ wch: 8 }, { wch: 22 }, { wch: 48 }];
                 XLSX.utils.book_append_sheet(wb, ws, label);
             });
             XLSX.writeFile(wb, `playball_roster_template_${getFormattedDate()}.xlsx`);
@@ -2212,15 +2213,22 @@
                             wb.SheetNames[idx];
                         if (!sheetName) return;
                         const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, blankrows: false });
+                        if (rows.length === 0) return;
+
+                        // 헤더에서 '선수명' 열을 찾는다. 타순만 있고 이름이 빈 행을 이름으로 오인하지 않도록.
+                        const header = (rows[0] || []).map(c => String(c == null ? '' : c).trim().toLowerCase());
+                        let nameCol = header.findIndex(h => h.includes('선수명') || h.includes('이름') || h.includes('name'));
+                        if (nameCol === -1) {
+                            // 헤더에 '선수명'이 없으면: 열이 2개 이상이면 둘째 열, 한 열뿐이면 첫 열을 이름으로
+                            nameCol = header.length >= 2 ? 1 : 0;
+                        }
+
                         const names = [];
                         for (let i = 1; i < rows.length; i++) { // 0행은 헤더
-                            const row = rows[i] || [];
-                            // [타순, 선수명] 기준. 선수명이 없고 한 칸짜리면 그 값을 이름으로 간주(헤더 오인 방지 위해 1열 우선)
-                            let name = row[1];
-                            if (name === undefined && row.length === 1) name = row[0];
-                            names.push(name === undefined || name === null ? '' : String(name).trim());
+                            const v = (rows[i] || [])[nameCol];
+                            names.push(v === undefined || v === null ? '' : String(v).trim());
                         }
-                        // 뒤쪽 빈칸 제거
+                        // 뒤쪽 빈칸 제거(행 수 제한 없음 — 9명 초과도 그대로 반영)
                         while (names.length && !names[names.length - 1]) names.pop();
                         roster[team] = names;
                     });
