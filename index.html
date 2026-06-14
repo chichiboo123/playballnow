@@ -7,8 +7,29 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BE%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Nanum+Gothic&family=Sunflower:wght@300&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'KBO Dia Gothic';
+            src: url('./fonts/KBODiaGothic_light.woff') format('woff');
+            font-weight: 300;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'KBO Dia Gothic';
+            src: url('./fonts/KBODiaGothic_medium.woff') format('woff');
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'KBO Dia Gothic';
+            src: url('./fonts/KBODiaGothic_bold.woff') format('woff');
+            font-weight: 700;
+            font-display: swap;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -30,7 +51,7 @@
         }
 
         body {
-            font-family: 'Nanum Gothic', sans-serif;
+            font-family: 'KBO Dia Gothic', sans-serif;
             background: #f3f4f6;
             color: #1f2937;
             min-height: 100vh;
@@ -54,11 +75,13 @@
         }
 
         .font-korean {
-            font-family: 'Do Hyeon', sans-serif;
+            font-family: 'KBO Dia Gothic', sans-serif;
+            font-weight: 700;
         }
 
         .font-korean-light {
-            font-family: 'Sunflower', sans-serif;
+            font-family: 'KBO Dia Gothic', sans-serif;
+            font-weight: 300;
         }
 
         .font-scoreboard {
