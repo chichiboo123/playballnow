@@ -1382,29 +1382,7 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <input type="text" class="score-input" placeholder="HOME" 
-                                               id="home-team-name" 
-                                               onchange="updateTeamName('home', this.value)">
-                                    </td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 0, this.value)" id="home-inning-0"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 1, this.value)" id="home-inning-1"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 2, this.value)" id="home-inning-2"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 3, this.value)" id="home-inning-3"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 4, this.value)" id="home-inning-4"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 5, this.value)" id="home-inning-5"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 6, this.value)" id="home-inning-6"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 7, this.value)" id="home-inning-7"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 8, this.value)" id="home-inning-8"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 9, this.value)" id="home-inning-9"></td>
-                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 10, this.value)" id="home-inning-10"></td>
-                                    <td class="stat-cell" id="home-runs">0</td>
-                                    <td class="stat-cell" id="home-hits">0</td>
-                                    <td class="stat-cell" id="home-errors">0</td>
-                                    <td class="stat-cell" id="home-walks">0</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="text" class="score-input" placeholder="AWAY" 
+                                        <input type="text" class="score-input" placeholder="AWAY"
                                                id="away-team-name"
                                                onchange="updateTeamName('away', this.value)">
                                     </td>
@@ -1423,6 +1401,28 @@
                                     <td class="stat-cell" id="away-hits">0</td>
                                     <td class="stat-cell" id="away-errors">0</td>
                                     <td class="stat-cell" id="away-walks">0</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="score-input" placeholder="HOME"
+                                               id="home-team-name"
+                                               onchange="updateTeamName('home', this.value)">
+                                    </td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 0, this.value)" id="home-inning-0"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 1, this.value)" id="home-inning-1"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 2, this.value)" id="home-inning-2"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 3, this.value)" id="home-inning-3"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 4, this.value)" id="home-inning-4"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 5, this.value)" id="home-inning-5"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 6, this.value)" id="home-inning-6"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 7, this.value)" id="home-inning-7"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 8, this.value)" id="home-inning-8"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 9, this.value)" id="home-inning-9"></td>
+                                    <td><input type="number" class="score-input" min="0" max="99" value="0" onchange="updateInningScore('home', 10, this.value)" id="home-inning-10"></td>
+                                    <td class="stat-cell" id="home-runs">0</td>
+                                    <td class="stat-cell" id="home-hits">0</td>
+                                    <td class="stat-cell" id="home-errors">0</td>
+                                    <td class="stat-cell" id="home-walks">0</td>
                                 </tr>
                             </tbody>
                         </table>
